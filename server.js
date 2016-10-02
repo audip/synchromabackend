@@ -1,9 +1,23 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var request = require('superagent');
+var firebase = require("firebase");
 
+// Config for express
 const app = express();
 
+// Config for firebase
+var config = {
+  apiKey: "AIzaSyCr0XK0q61g6Xs22lKKIxPANevyFrHcuuc",
+  databaseURL: "https://synchroma-ea381.firebaseio.com"
+};
+firebase.initializeApp(config);
+
+// As an admin, the app has access to read and write all data, regardless of Security Rules
+var db = firebase.database();
+var ref = db.ref("/user-transactions");
+
+// Config for body-parser
 app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -40,57 +54,63 @@ app.post('/api-server', function(req, res, next){
         const customers = ['57f09ee9267ebde464c48a38', '57f0a40d267ebde464c48a47'];
         const accounts = ['57f0c26d267ebde464c48a52', '57f0c28a267ebde464c48a57'];
 
+        var cmd_word = cmd.substr(0, cmd.indexOf(" "));
+        var amt= 0;
+        var txnRef;
+
+        // When splitting the bill
+        if (cmd_word == "split"){
+            const the_sign = cmd.indexOf("$");
+            var cut_off_string = cmd.substr(the_sign+1);
+            console.log(cut_off_string);
+            var amt = parseFloat(cut_off_string.substr(0, cmd.indexOf(" ")));
+            txnRef = ref.child("transaction");
+            txnRef.set({
+                amount: amt,
+                active_users: 1,
+                timestamp: Date.now()
+            });
+            res.set('Content-Type', 'text/json');
+            res.send({data:"Ready to connect devices"});
+        }
+        else if (cmd_word == "pay" || cmd_word == "connect") {
+            txnRef = ref.child("transaction/active_users");
+            txnRef.transaction(function (current_value) {
+                return (current_value || 0) + 1;
+            });
+        }
+        ref.once("value", function(snapshot){
+            amt = snapshot.val().transaction.amount/2;
+        });
         request
             .post('http://api.reimaginebanking.com/accounts/'+accounts[0]+'/transfers?key='+apiKey)
             .send({
                 "medium": "balance",
                 "payee_id": accounts[1],
-                "amount": 0.10
+                "amount": 50
             })
             .end(function(err, result){
                 if (err) {
                     console.log(err);
                 } else {
                     res.set('Content-Type', 'text/json');
-                    res.send({data:"Amount shared between your friends."});
+                    res.send({data:"Amount shared between your friends is $"+amt});
                     console.log("Transfer completed between users.");
                 }
             });
+
                         break;
     };
 
 
     // Post to corresponding function
-    test_response = {
-        "hey_word": hey_word,
-        "cmd":cmd
-    };
+    //test_response = {
+    //    "hey_word": hey_word,
+    //    "cmd":cmd
+    //};
     //res.set('Content-Type', 'text/plain');
     //res.send(test_response);
 });
-
-function nessie(request, response){
-    const apiKey = '23e0ca12ab71026c1cba2ce4ecd6031d';
-    const customers = ['57f09ee9267ebde464c48a38', '57f0a40d267ebde464c48a47'];
-    const accounts = ['57f0c26d267ebde464c48a52', '57f0c28a267ebde464c48a57'];
-
-    request
-        .post('http://api.reimaginebanking.com/accounts/'+accounts[0]+'/transfers?key='+apiKey)
-        .send({
-            "medium": "balance",
-            "payee_id": accounts[1],
-            "amount": 0.10
-        })
-        .end(function(err, res){
-            if (err) {
-                console.log(err);
-            } else {
-                response.set('Content-Type', 'text/json');
-                response.send({data:"Amount shared between your friends."});
-                console.log("Transfer completed between users.");
-            }
-        });
-};
 
 function alexa(){
     console.log("Nice to hear from you");
