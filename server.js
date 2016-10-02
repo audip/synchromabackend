@@ -40,12 +40,12 @@ app.post('/api-server', function(req, res, next){
     var cmd = data.substr(data.indexOf(" ")+1);
 
     // List of API to connect with
-    const apis = ["alexa", "nessie", "google"];
+    //const apis = ["alexa", "nessie", "google"];
 
     // Return error when api functionality not found
-    if (!(apis.includes(hey_word))) {
-        handleError(res, "Sorry, we are yet to build that functionality");
-    }
+    //if (!(apis.includes(hey_word))) {
+    //    handleError(res, "Sorry, we are yet to build that functionality");
+    //}
 
     // Find api corresponding to cmd
     switch(hey_word) {
