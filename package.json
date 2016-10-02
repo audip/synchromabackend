@@ -1,24 +1,25 @@
 {
-    "name": "synchroma",
-    "main": "server.js",
-    "version": "1.0.0",
-    "description": "",
-    "scripts": {
-	           "test": "echo \"Error: no test specified\" && exit 1"
-	        },
-	"repository": {
-    	    "type": "git",
-	        "url": ""
-     },
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-	    "url": ""
-	    },
-	"homepage": "",  
-    "dependencies": {
-        "body-parser": "^1.15.2",
-        "express": "^4.14.0",
-        "request": "^2.75.0"
-    }
+  "name": "synchroma",
+  "main": "server.js",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "request": "^2.75.0",
+    "superagent": "^2.3.0"
+  }
 }
