@@ -55,15 +55,18 @@ app.post('/api-server', function(req, res, next){
         const accounts = ['57f0c26d267ebde464c48a52', '57f0c28a267ebde464c48a57'];
 
         var cmd_word = cmd.substr(0, cmd.indexOf(" "));
-        var action = cmd.substr(cmd.indexOf(" ")+1);
-
+        var amt= 0;
         var txnRef;
 
         // When splitting the bill
         if (cmd_word == "split"){
+            const the_sign = cmd.indexOf("$");
+            var cut_off_string = cmd.substr(the_sign+1);
+            console.log(cut_off_string);
+            var amt = parseFloat(cut_off_string.substr(0, cmd.indexOf(" ")));
             txnRef = ref.child("transaction");
             txnRef.set({
-                amount: 50,
+                amount: amt,
                 active_users: 1,
                 timestamp: Date.now()
             });
@@ -76,30 +79,26 @@ app.post('/api-server', function(req, res, next){
                 return (current_value || 0) + 1;
             });
         }
-        var process_ready = false
-
-        // Finish the transaction when 10 sec pass by.
-        ref.on("child_changed", function(snapshot) {
-            var last_update = snapshot.val().transaction;
-            if ((Date.now() - last_update.timestamp) >= 10) {
-                request
-                    .post('http://api.reimaginebanking.com/accounts/'+accounts[0]+'/transfers?key='+apiKey)
-                    .send({
-                        "medium": "balance",
-                        "payee_id": accounts[1],
-                        "amount": 0.10
-                    })
-                    .end(function(err, result){
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            res.set('Content-Type', 'text/json');
-                            res.send({data:"Amount shared between your friends."});
-                            console.log("Transfer completed between users.");
-                        }
-                    });
-            }
+        ref.once("value", function(snapshot){
+            amt = snapshot.val().transaction.amount/2;
         });
+        request
+            .post('http://api.reimaginebanking.com/accounts/'+accounts[0]+'/transfers?key='+apiKey)
+            .send({
+                "medium": "balance",
+                "payee_id": accounts[1],
+                "amount": 50
+            })
+            .end(function(err, result){
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.set('Content-Type', 'text/json');
+                    res.send({data:"Amount shared between your friends is $"+amt});
+                    console.log("Transfer completed between users.");
+                }
+            });
+
                         break;
     };
 
