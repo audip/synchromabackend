@@ -61,36 +61,13 @@ app.post('/api-server', function(req, res, next){
 
 
     // Post to corresponding function
-    test_response = {
-        "hey_word": hey_word,
-        "cmd":cmd
-    };
+    //test_response = {
+    //    "hey_word": hey_word,
+    //    "cmd":cmd
+    //};
     //res.set('Content-Type', 'text/plain');
     //res.send(test_response);
 });
-
-function nessie(request, response){
-    const apiKey = '23e0ca12ab71026c1cba2ce4ecd6031d';
-    const customers = ['57f09ee9267ebde464c48a38', '57f0a40d267ebde464c48a47'];
-    const accounts = ['57f0c26d267ebde464c48a52', '57f0c28a267ebde464c48a57'];
-
-    request
-        .post('http://api.reimaginebanking.com/accounts/'+accounts[0]+'/transfers?key='+apiKey)
-        .send({
-            "medium": "balance",
-            "payee_id": accounts[1],
-            "amount": 0.10
-        })
-        .end(function(err, res){
-            if (err) {
-                console.log(err);
-            } else {
-                response.set('Content-Type', 'text/json');
-                response.send({data:"Amount shared between your friends."});
-                console.log("Transfer completed between users.");
-            }
-        });
-};
 
 function alexa(){
     console.log("Nice to hear from you");
