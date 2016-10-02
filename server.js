@@ -81,6 +81,7 @@ app.post('/api-server', function(req, res, next){
         }
         ref.once("value", function(snapshot){
             amt = snapshot.val().transaction.amount/2;
+            console.log(amt);
         });
         request
             .post('http://api.reimaginebanking.com/accounts/'+accounts[0]+'/transfers?key='+apiKey)
